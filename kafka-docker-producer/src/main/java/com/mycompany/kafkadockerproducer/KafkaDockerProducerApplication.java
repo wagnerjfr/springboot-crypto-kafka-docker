@@ -24,12 +24,24 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		String bootstrap_server="localhost";
+		Long initial_delay = 0L;
 
-		// wait for 30s before staring producing messages
-		Thread.sleep(30000);
+		if (args.length < 1) {
+			System.err.println("java -jar target/kafka-docker-producer <bootstrap-server> [<initial_delay>]");
+			System.err.println("Example: java -jar target/kafka-docker-producer localhost:29092 1000");
+			System.exit(1);
+		}
+		else {
+			bootstrap_server = args[0];
+			initial_delay = (args.length == 2) ? Long.valueOf(args[1]) : 0;
+		}
+
+
+		Thread.sleep(initial_delay);
 
 		Properties properties = new Properties();
-		properties.put("bootstrap.servers", "kafka:9092");
+		properties.put("bootstrap.servers", bootstrap_server);
 		properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		properties.put("acks", "1");

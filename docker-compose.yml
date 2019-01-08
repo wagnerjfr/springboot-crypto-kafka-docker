@@ -6,8 +6,6 @@ services:
     image: confluentinc/cp-zookeeper:5.1.0
     container_name: zookeeper
     restart: unless-stopped
-    ports:
-      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       TZ: "${TZ-Europe/London}"
@@ -22,10 +20,11 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_DELETE_TOPIC_ENABLE: "true"
       TZ: "${TZ-Europe/London}"
@@ -75,6 +74,8 @@ services:
     depends_on:
     - kafka-topics-ui
     environment:
+      KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
+      KAFKA_GROUP_ID: "my-group"
       TOPIC: "BTC"
 
   consumer-ltc:
@@ -83,6 +84,8 @@ services:
     depends_on:
     - kafka-topics-ui
     environment:
+      KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
+      KAFKA_GROUP_ID: "my-group"
       TOPIC: "LTC"
 
   producer:
@@ -90,4 +93,7 @@ services:
     container_name: producer
     depends_on:
     - consumer-btc
-
+    - consumer-ltc
+    environment:
+      KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
+      INITIAL_DELAY: 30000

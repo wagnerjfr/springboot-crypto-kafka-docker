@@ -20,13 +20,27 @@ public class KafkaDockerConsumerApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		String topic = args[0];
+
+		String bootstrap_server="localhost";
+		String topic = "";
+		String group_id = "";
+
+		if (args.length < 3) {
+			System.err.println("java -jar target/kafka-docker-consumer <bootstrap_server> <group_id> <topic>");
+			System.err.println("Example: java -jar target/kafka-docker-consumer localhost:29092 my-group BTC");
+			System.exit(1);
+		}
+		else {
+			bootstrap_server = args[0];
+			group_id = args[1];
+			topic = args[2];
+		}
 
 		Properties properties = new Properties();
-		properties.put("bootstrap.servers", "kafka:9092");
+		properties.put("bootstrap.servers", bootstrap_server);
 		properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-		properties.put("group.id", "my-group");
+		properties.put("group.id", group_id);
 
 		KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(properties);
 		List<String> topics = new ArrayList<>();
