@@ -12,7 +12,7 @@ Run the command below to clone the project:
 ```
 git clone https://github.com/wagnerjfr/springboot-crypto-kafka-docker.git
 ```
-After the process is finished access the project folder and execute the maven command:
+After the process is finished, access the project folder and execute the maven command:
 ```
 cd springboot-crypto-kafka-docker
 mvn clean package -DskipTests
