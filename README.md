@@ -1,9 +1,6 @@
 # springboot-crypto-kafka-docker
 
-This project, in order to deploy Confluent Kafka in the machine, starts 4 Docker containers (ZooKeeper, Kafka, Kafka-REST-Proxy
-and Kafka-Topics-UI). It also starts 3 other containers (1 Producer and 2 Consumers) to emulate message publish/consume
-using crypto currencies JSON data. The Producer and Consumers images were developed using SpringBoot and the containers
-are later started using Docker-Compose. The project uses Bitcoin, Litecoin, and other currency JSON data from Bitstamp API.  
+In order to deploy Confluent Kafka in the machine, this project starts 4 Docker containers (ZooKeeper, Kafka, Kafka-REST-Proxy and Kafka-Topics-UI). It also starts 3 other containers (1 Producer and 2 Consumers) to emulate message publish/consume using crypto currencies JSON data. The Producer and Consumers images were developed using SpringBoot and the containers are later started using Docker-Compose. The project uses Bitcoin, Litecoin, and other currency JSON data from Bitstamp API.  
 
 ## Steps
 
