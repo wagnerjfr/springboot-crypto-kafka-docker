@@ -3,7 +3,7 @@
 This project, in order to deploy Confluent Kafka in the machine, starts 4 Docker containers (ZooKeeper, Kafka, Kafka-REST-Proxy
 and Kafka-Topics-UI). It also starts 3 other containers (1 Producer and 2 Consumers) to emulate message publish/consume
 using crypto currencies JSON data. The Producer and Consumers images were developed using SpringBoot and the containers
-are later started using Docker-Compose. The project uses Bitcoin and Litecoin JSON data from Bitstamp API.  
+are later started using Docker-Compose. The project uses Bitcoin, Litecoin, and other currency JSON data from Bitstamp API.  
 
 ## Steps
 
@@ -103,19 +103,81 @@ We have 2 Consumers (**consumer-btc** and **consumer-ltc**), each one reading ju
 
 Docker-compose logs shows:
 ```console
-producer            | JSON data for 'BTC' sent.
-consumer-btc        | Topic - BTC, Partition - 0, Value: 3998.34
-producer            | JSON data for 'LTC' sent.
-consumer-ltc        | Topic - LTC, Partition - 0, Value: 37.62
-producer            | JSON data for 'BTC' sent.
-consumer-btc        | Topic - BTC, Partition - 0, Value: 3998.34
-producer            | JSON data for 'LTC' sent.
-consumer-ltc        | Topic - LTC, Partition - 0, Value: 37.62
+producer            | [17:20:33.090] JSON data sent to topic LTC.
+consumer-ltc        | [17:20:33.092] Topic - LTC, Partition - 0, Value: 39.39
+consumer-btc        | [17:20:36.364] Topic - BTC, Partition - 0, Value: 4014.00
+producer            | [17:20:36.363] JSON data sent to topic BTC.
+producer            | [17:20:39.642] JSON data sent to topic LTC.
+consumer-ltc        | [17:20:39.644] Topic - LTC, Partition - 0, Value: 39.39
+producer            | [17:20:42.916] JSON data sent to topic BTC.
+consumer-btc        | [17:20:42.919] Topic - BTC, Partition - 0, Value: 4014.00
+producer            | [17:20:46.201] JSON data sent to topic LTC.
+consumer-ltc        | [17:20:46.203] Topic - LTC, Partition - 0, Value: 39.39
+producer            | [17:20:49.573] JSON data sent to topic BTC.
+consumer-btc        | [17:20:49.574] Topic - BTC, Partition - 0, Value: 4014.00
 ```
 Access <http://localhost:8085/> to see the topics and received data graphically.
 ![alt text](https://github.com/wagnerjfr/springboot-crypto-kafka-docker/blob/master/figures/kafka-topics-ui.png)
 
-### 5. Clean up
+### 5. Running extra containers and/or jar files
+It's possible to execute more jar files to produce and consume different currencies using the same Kafka.
+
+Open a different terminal, go to project root folder and start a producer jar to publish BCH and ETH prices.
+```
+java -jar kafka-docker-producer/target/kafka-docker-producer-0.0.1-SNAPSHOT.jar localhost:29092 1000 3000 BCH,ETH
+```
+Parameters:
+1. KAFKA_BOOTSTRAP_SERVER (Kafka server): **localhost:29092**
+2. INITIAL_DELAY (amount of time in milliseconds to wait before starting producing): **1000** (1s)
+3. INTERVAL (amount of time in milliseconds between messages): **3000** (3s)
+4. TOPICS (Kafka topics): **BCH,ETH**
+
+In another terminal, start a consumer jar to read BCH and ETH prices.
+
+***IMPORTANT: Each crypto currency producer's topic (BTC, LTC, etc) has just one partition. Use different group ids
+when creating a consumer to avoid creating a consumer which will be part of an existing consumer group. If it happens,
+having just one partition, this new consumer instance will just receive data when the first consumer in the group stops.***
+
+```
+java -jar kafka-docker-consumer/target/kafka-docker-consumer-0.0.1-SNAPSHOT.jar localhost:29092 my-group BCH,ETH
+```
+Parameters:
+
+1. KAFKA_BOOTSTRAP_SERVER (Kafka server): **localhost:29092**
+2. GROUP_ID (consumer's group): **my-group**
+3. TOPICS (Kafka topics): **BCH,ETH**
+
+***To stop the executions type Ctrl+C.***
+
+Let's now start containers to produce and consume XRP prices.
+
+In a different terminal, execute the command below to create the producer:
+```
+docker run -t --net springboot-crypto-kafka-docker_default --name producer-xrp \
+   -e KAFKA_BOOTSTRAP_SERVER='kafka:9092' \
+   -e INITIAL_DELAY=1000 \
+   -e INTERVAL=3000 \
+   -e TOPICS='XRP'  \
+   docker.mycompany.com/kafka-docker-producer:latest
+```
+In another terminal, execute the command below to create the consumer:
+```
+docker run -t --net springboot-crypto-kafka-docker_default --name consumer-xrp \
+   -e KAFKA_BOOTSTRAP_SERVER='kafka:9092' \
+   -e KAFKA_GROUP_ID='my-group' \
+   -e TOPICS='XRP' \
+   docker.mycompany.com/kafka-docker-consumer:latest
+```
+To stop the containers:
+```
+docker stop producer-xrp consumer-xrp
+```
+To remove the stopped containers:
+```
+docker rm producer-xrp consumer-xrp
+```
+
+### 6. Clean up
 Go to the root folder where is'docker-compose.yml'.
 
 To stop all containers execute:

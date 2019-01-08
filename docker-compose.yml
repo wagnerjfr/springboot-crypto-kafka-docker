@@ -76,7 +76,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
       KAFKA_GROUP_ID: "my-group"
-      TOPIC: "BTC"
+      TOPICS: "BTC"
 
   consumer-ltc:
     image: docker.mycompany.com/kafka-docker-consumer
@@ -86,7 +86,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
       KAFKA_GROUP_ID: "my-group"
-      TOPIC: "LTC"
+      TOPICS: "LTC"
 
   producer:
     image: docker.mycompany.com/kafka-docker-producer:latest
@@ -97,3 +97,5 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
       INITIAL_DELAY: 30000
+      INTERVAL: 3000
+      TOPICS: "BTC,LTC"

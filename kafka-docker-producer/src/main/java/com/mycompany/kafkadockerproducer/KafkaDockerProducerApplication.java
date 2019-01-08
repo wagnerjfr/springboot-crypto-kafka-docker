@@ -11,12 +11,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 @SpringBootApplication
 public class KafkaDockerProducerApplication implements CommandLineRunner {
 
 	private KafkaProducer<String,String> kafkaProducer;
+	private Long interval;
 
 	public static void main(String[] args) {
 		SpringApplication.run(KafkaDockerProducerApplication.class, args);
@@ -24,19 +28,24 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		String bootstrap_server="localhost";
-		Long initial_delay = 0L;
+		String bootstrap_server;
+		Long initial_delay;
+		List<CryptoType> listTopics;
 
-		if (args.length < 1) {
-			System.err.println("java -jar target/kafka-docker-producer <bootstrap-server> [<initial_delay>]");
-			System.err.println("Example: java -jar target/kafka-docker-producer localhost:29092 1000");
+		if (args.length < 4) {
+			System.err.println("java -jar target/kafka-docker-producer <bootstrap-server> <initial_delay> <interval> <topic-1> -- <topic-n>");
+			System.err.println("Example: java -jar target/kafka-docker-producer localhost:29092 1000 3000 BTC,LTC,ETH");
 			System.exit(1);
 		}
-		else {
-			bootstrap_server = args[0];
-			initial_delay = (args.length == 2) ? Long.valueOf(args[1]) : 0;
-		}
 
+		listTopics = new ArrayList<>();
+		bootstrap_server = args[0];
+		initial_delay = Long.valueOf(args[1]);
+		interval = Long.valueOf(args[2]);
+		String[] topics = args[3].split(",");
+		for (String t: topics) {
+			listTopics.add(FactortyCryptoType.getCryptoType(t));
+		}
 
 		Thread.sleep(initial_delay);
 
@@ -51,8 +60,11 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
 		String data;
 		try {
 			while(true){
-				sendData("BTC", "https://www.bitstamp.net/api/v2/ticker_hour/btcusd/");
-				sendData("LTC", "https://www.bitstamp.net/api/v2/ticker_hour/ltcusd/");
+				for (CryptoType crypto: listTopics) {
+					if (crypto != CryptoType.UNKNOW) {
+						sendData(crypto.getInitials(), crypto.getUrl());
+					}
+				}
 			}
 		}
 		finally {
@@ -67,10 +79,10 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
 				if (e != null)
 					e.printStackTrace();
 				else
-					System.out.println(String.format("JSON data for '%s' sent.", topic));
+					System.out.println(String.format("[%s] JSON data sent to topic %s.", LocalTime.now().toString(), topic));
 			}
 		);
-		Thread.sleep(3000);
+		Thread.sleep(interval);
 	}
 
 	private String getRequest(String url) throws IOException {
