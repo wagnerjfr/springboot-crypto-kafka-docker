@@ -1,6 +1,6 @@
 FROM openjdk:8-jdk-alpine
 
-LABEL maintainer="wagnerjfr@yahoo.com.br"
+LABEL maintainer="Wagner Franchin"
 
 ENV KAFKA_BOOTSTRAP_SERVER ""
 ENV KAFKA_GROUP_ID ""
