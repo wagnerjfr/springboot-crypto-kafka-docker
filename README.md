@@ -96,7 +96,7 @@ docker-compose logs -f
 docker-compose ps
 ```
 ### 4. Check the results
-After some seconds, the Producer starts publishing data and Consumers starts consuming it.
+After some seconds, the Producer starts publishing data and Consumers start consuming it.
 
 The Producer publishes data in 2 topics "BTC" and "LTC".
 
