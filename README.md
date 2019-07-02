@@ -179,7 +179,7 @@ docker rm producer-xrp consumer-xrp
 ```
 
 ### 6. Clean up
-Go to the root folder where is'docker-compose.yml'.
+Go to the root folder where is *docker-compose.yml*.
 
 To stop all containers execute:
 ```
