@@ -1,8 +1,8 @@
 # springboot-crypto-kafka-docker
 
-In order to deploy [Confluent Kafka](https://www.confluent.io/) in the machine, this project starts 4 Docker containers ([ZooKeeper](https://zookeeper.apache.org/), [Kafka](https://kafka.apache.org/), [Kafka-REST-Proxy](https://docs.confluent.io/3.0.0/kafka-rest/docs/index.html) and [Kafka-Topics-UI](http://kafka-topics-ui.landoop.com/)). 
+In order to deploy [Confluent Kafka](https://www.confluent.io/) in the machine, this project starts four Docker containers ([ZooKeeper](https://zookeeper.apache.org/), [Kafka](https://kafka.apache.org/), [Kafka-REST-Proxy](https://docs.confluent.io/3.0.0/kafka-rest/docs/index.html) and [Kafka-Topics-UI](http://kafka-topics-ui.landoop.com/)). 
 
-It also starts 3 other containers (1 Producer and 2 Consumers) to emulate message publish/consume using crypto currencies JSON data. The Producer and Consumers images were developed using [SpringBoot](https://spring.io/projects/spring-boot) and the containers are later started using [Docker-Compose](https://docs.docker.com/compose/). The project uses the [Bitstamp REST API](https://www.bitstamp.net/api/) to grab JSON data for Bitcoin, Litecoin, and other crypto currencies.  
+It also starts three other containers (one Producer and two Consumers) to emulate message publish/consume using crypto currencies JSON data. The Producer and Consumers images were developed using [SpringBoot](https://spring.io/projects/spring-boot) and the containers are later started using [Docker-Compose](https://docs.docker.com/compose/). The project uses the [Bitstamp REST API](https://www.bitstamp.net/api/) to grab JSON data for Bitcoin, Litecoin, and other crypto currencies.  
 
 ## Steps
 
