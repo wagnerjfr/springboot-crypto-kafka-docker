@@ -89,11 +89,11 @@ We are using Docker-Compose to start the containers. Go to the root folder where
 ```
 docker-compose up -d
 ```
-[Optional] You can either open a separate terminal and follow the logs while systems are initializing:
+*[Optional]* You can either open a separate terminal and follow the logs while systems are initializing:
 ```
 docker-compose logs -f
 ```
-[Optional] Or check the starting status:
+*[Optional]* Or check the starting status:
 ```
 docker-compose ps
 ```
