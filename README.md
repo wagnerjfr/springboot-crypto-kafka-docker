@@ -85,7 +85,7 @@ docker.mycompany.com/kafka-docker-producer     0.0.1-SNAPSHOT      e11af0e5cbca 
 docker.mycompany.com/kafka-docker-producer     latest              e11af0e5cbca        39 minutes ago      133MB
 ```
 ### 3. Create the containers
-We are using Docker-Compose to start the containers. Go to the root folder where 'docker-compose.yml' is located and run the below command:
+We are using **Docker-Compose** to start the containers. Go to the root folder where 'docker-compose.yml' is located and run the below command:
 ```
 docker-compose up -d
 ```
