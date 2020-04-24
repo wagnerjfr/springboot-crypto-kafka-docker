@@ -150,7 +150,7 @@ Parameters:
 2. GROUP_ID (consumer's group): **my-group**
 3. TOPICS (Kafka topics): **BCH,ETH**
 
-***To stop the executions type Ctrl+C.***
+***To stop the executions type Ctrl + C.***
 
 Let's now start containers to produce and consume XRP prices.
 
