@@ -180,7 +180,7 @@ To remove the stopped containers:
 docker rm producer-xrp consumer-xrp
 ```
 
-### 6. Clean up
+### 6. Cleaning up
 Go to the root folder where is *docker-compose.yml*.
 
 To stop all containers execute:
@@ -205,7 +205,7 @@ Removing kafka            ... done
 Removing zookeeper        ... done
 Removing network springboot-crypto-kafka-docker_default
 ```
-Removing the Docker images created:
+To remove the Docker images created:
 ```
 docker rmi docker.mycompany.com/kafka-docker-consumer:0.0.1-SNAPSHOT
 docker rmi docker.mycompany.com/kafka-docker-consumer:latest
