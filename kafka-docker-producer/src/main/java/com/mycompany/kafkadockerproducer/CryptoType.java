@@ -1,7 +1,10 @@
 package com.mycompany.kafkadockerproducer;
 
+import lombok.Getter;
+
+@Getter
 public enum CryptoType {
-    UNKNOW("Unknow", "", ""),
+    UNKNOWN("Unknown", "", ""),
     BTC("Bitcoin", "BTC", "https://www.bitstamp.net/api/v2/ticker_hour/btcusd/"),
     LTC("Litecoin", "LTC", "https://www.bitstamp.net/api/v2/ticker_hour/ltcusd/"),
     BCH("Bitcoin Cash", "BCH", "https://www.bitstamp.net/api/v2/ticker_hour/bchusd/"),
@@ -11,21 +14,21 @@ public enum CryptoType {
     private String name;
     private String initials;
     private String url;
+
     CryptoType(String name, String initials, String url) {
         this.name = name;
         this.initials = initials;
         this.url = url;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getInitials() {
-        return initials;
-    }
-
-    public String getUrl() {
-        return url;
+    static CryptoType getCryptoType(String type) {
+        switch (type.toUpperCase()) {
+            case "BTC": return CryptoType.BTC;
+            case "LTC": return CryptoType.LTC;
+            case "BCH": return CryptoType.BCH;
+            case "XRP": return CryptoType.XRP;
+            case "ETH": return CryptoType.ETH;
+            default: return CryptoType.UNKNOWN;
+        }
     }
 }
