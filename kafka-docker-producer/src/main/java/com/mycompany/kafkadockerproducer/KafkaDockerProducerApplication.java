@@ -1,5 +1,6 @@
 package com.mycompany.kafkadockerproducer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.boot.CommandLineRunner;
@@ -16,11 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+@Slf4j
 @SpringBootApplication
 public class KafkaDockerProducerApplication implements CommandLineRunner {
 
     private KafkaProducer<String, String> kafkaProducer;
-    private Long interval;
+    private long interval;
+    private boolean stopped = false;
 
     public static void main(String[] args) {
         SpringApplication.run(KafkaDockerProducerApplication.class, args);
@@ -28,40 +31,43 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String bootstrap_server;
-        Long initial_delay;
-        List<CryptoType> listTopics;
+        String bootstrapServer = "";
+        long initialDelay = 0;
+        List<CryptoType> listTopics = new ArrayList<>();
 
         if (args.length < 4) {
-            System.err.println("java -jar target/kafka-docker-producer <bootstrap-server> <initial_delay> <interval> <topic-1> -- <topic-n>");
-            System.err.println("Example: java -jar target/kafka-docker-producer localhost:29092 1000 3000 BTC,LTC,ETH");
+            log.error("java -jar target/kafka-docker-producer <bootstrap-server> <initial_delay> <interval> <topic-1> -- <topic-n>");
+            log.error("Example: java -jar target/kafka-docker-producer localhost:29092 1000 3000 BTC,LTC,ETH");
             System.exit(1);
         }
 
-        listTopics = new ArrayList<>();
-        bootstrap_server = args[0];
-        initial_delay = Long.valueOf(args[1]);
-        interval = Long.valueOf(args[2]);
-        String[] topics = args[3].split(",");
-        for (String t : topics) {
-            listTopics.add(FactortyCryptoType.getCryptoType(t));
+        try {
+            bootstrapServer = args[0];
+            initialDelay = Long.valueOf(args[1]);
+            interval = Long.valueOf(args[2]);
+            String[] topics = args[3].split(",");
+            for (String t : topics) {
+                listTopics.add(CryptoType.getCryptoType(t));
+            }
+        } catch (Exception e) {
+            log.error("Exception {}", e);
+            System.exit(1);
         }
 
-        Thread.sleep(initial_delay);
+        Thread.sleep(initialDelay);
 
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", bootstrap_server);
+        properties.put("bootstrap.servers", bootstrapServer);
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("acks", "1");
 
         kafkaProducer = new KafkaProducer<>(properties);
 
-        String data;
         try {
-            while (true) {
+            while (!stopped) {
                 for (CryptoType crypto : listTopics) {
-                    if (crypto != CryptoType.UNKNOW) {
+                    if (crypto != CryptoType.UNKNOWN) {
                         sendData(crypto.getInitials(), crypto.getUrl());
                     }
                 }
@@ -76,12 +82,11 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
         ProducerRecord<String, String> record = new ProducerRecord<>(topic, topic, data);
         kafkaProducer.send(record, (recordMetadata, e) -> {
             if (e != null) {
-                e.printStackTrace();
+                log.error("Exception {}", e);
             } else {
-                System.out.println(String.format("[%s] JSON data sent to topic %s.", LocalTime.now().toString(), topic));
+                log.info(String.format("[%s] JSON data sent to topic %s.", LocalTime.now().toString(), topic));
             }
-            }
-        );
+        });
         Thread.sleep(interval);
     }
 
@@ -94,16 +99,18 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
         }
 
-        in.close();
-
         return response.toString();
+    }
+
+    public void stop() {
+        this.stopped = true;
     }
 }
 
