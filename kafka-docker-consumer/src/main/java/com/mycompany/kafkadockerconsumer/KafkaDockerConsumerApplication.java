@@ -52,7 +52,7 @@ public class KafkaDockerConsumerApplication implements CommandLineRunner {
         try {
             while (!stopped) {
                 ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(100));
-                for (ConsumerRecord record : records) {
+                for (ConsumerRecord<String, String> record : records) {
                     log.info(String.format("[%s] Topic - %s, Partition - %d, Value: %s", LocalDateTime.now().toString(), record.topic(),
                         record.partition(), getRecordCryptoCurrentValue(record)));
                 }
@@ -64,9 +64,10 @@ public class KafkaDockerConsumerApplication implements CommandLineRunner {
         }
     }
 
-    private String getRecordCryptoCurrentValue(ConsumerRecord record) {
-        String info = record.value().toString();
-        String value = info.substring(info.indexOf("\"last\""), info.indexOf(", \"times")).replace("\"", "").trim();
+    private String getRecordCryptoCurrentValue(ConsumerRecord<String, String> record) {
+        String info = record.value();
+        log.info(info);
+        String value = info.substring(info.indexOf("\"last\""), info.indexOf(", \"volume")).replace("\"", "").trim();
         return value.substring(value.indexOf(':') + 1).trim();
     }
 

@@ -43,14 +43,14 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
 
         try {
             bootstrapServer = args[0];
-            initialDelay = Long.valueOf(args[1]);
-            interval = Long.valueOf(args[2]);
+            initialDelay = Long.parseLong(args[1]);
+            interval = Long.parseLong(args[2]);
             String[] topics = args[3].split(",");
             for (String t : topics) {
                 listTopics.add(CryptoType.getCryptoType(t));
             }
         } catch (Exception e) {
-            log.error("Exception {}", e);
+            log.error("Exception {}", e.getMessage(), e);
             System.exit(1);
         }
 
@@ -82,7 +82,7 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
         ProducerRecord<String, String> record = new ProducerRecord<>(topic, topic, data);
         kafkaProducer.send(record, (recordMetadata, e) -> {
             if (e != null) {
-                log.error("Exception {}", e);
+                log.error("Exception {}", e.getMessage(), e);
             } else {
                 log.info(String.format("[%s] JSON data sent to topic %s.", LocalTime.now().toString(), topic));
             }
