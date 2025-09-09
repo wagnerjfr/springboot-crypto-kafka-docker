@@ -84,7 +84,7 @@ public class KafkaDockerProducerApplication implements CommandLineRunner {
             if (e != null) {
                 log.error("Exception {}", e.getMessage(), e);
             } else {
-                log.info(String.format("[%s] JSON data sent to topic %s.", LocalTime.now().toString(), topic));
+                log.info("[{}] JSON data sent to topic {}}.", LocalTime.now().toString(), topic);
             }
         });
         Thread.sleep(interval);

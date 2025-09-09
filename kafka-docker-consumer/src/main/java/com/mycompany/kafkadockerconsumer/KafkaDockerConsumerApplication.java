@@ -53,8 +53,8 @@ public class KafkaDockerConsumerApplication implements CommandLineRunner {
             while (!stopped) {
                 ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord<String, String> record : records) {
-                    log.info(String.format("[%s] Topic - %s, Partition - %d, Value: %s", LocalDateTime.now().toString(), record.topic(),
-                        record.partition(), getRecordCryptoCurrentValue(record)));
+                    log.info("[{}}] Topic - {}, Partition - {}, Value: {}}", LocalDateTime.now(), record.topic(),
+                        record.partition(), getRecordCryptoCurrentValue(record));
                 }
             }
         } catch (Exception e) {
