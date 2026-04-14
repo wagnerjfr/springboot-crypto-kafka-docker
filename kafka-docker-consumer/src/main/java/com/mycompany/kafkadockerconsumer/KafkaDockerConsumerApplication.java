@@ -1,5 +1,7 @@
 package com.mycompany.kafkadockerconsumer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -18,6 +20,7 @@ import java.util.Arrays;
 @SpringBootApplication
 public class KafkaDockerConsumerApplication implements CommandLineRunner {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private boolean stopped = false;
 
     public static void main(String[] args) {
@@ -53,8 +56,12 @@ public class KafkaDockerConsumerApplication implements CommandLineRunner {
             while (!stopped) {
                 ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord<String, String> record : records) {
-                    log.info("[{}}] Topic - {}, Partition - {}, Value: {}}", LocalDateTime.now(), record.topic(),
-                        record.partition(), getRecordCryptoCurrentValue(record));
+                    try {
+                        log.info("[{}] Topic - {}, Partition - {}, Value: {}", LocalDateTime.now(), record.topic(),
+                            record.partition(), getRecordCryptoCurrentValue(record));
+                    } catch (Exception e) {
+                        log.error("Failed to parse record from topic {}: {}", record.topic(), e.getMessage());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -67,8 +74,13 @@ public class KafkaDockerConsumerApplication implements CommandLineRunner {
     private String getRecordCryptoCurrentValue(ConsumerRecord<String, String> record) {
         String info = record.value();
         log.info(info);
-        String value = info.substring(info.indexOf("\"last\""), info.indexOf(", \"volume")).replace("\"", "").trim();
-        return value.substring(value.indexOf(':') + 1).trim();
+        try {
+            JsonNode root = OBJECT_MAPPER.readTree(info);
+            JsonNode lastValue = root.get("last");
+            return lastValue != null ? lastValue.asText() : "N/A";
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid JSON payload", e);
+        }
     }
 
     public void stop() {
